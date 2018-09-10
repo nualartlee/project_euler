@@ -1,97 +1,88 @@
-import fileinput
-import itertools
+#!/usr/bin/env python3
 
 
-def get_half_digits(digits):
-    if digits % 2 == 1:
-        return int(digits/2) + 1
-    return int(digits/2)
-
-
-def get_even_digit_balanced_numbers(half_digits, base, limit):
+def balance_right(digit_list, base):
     """
-    Get the list of balanced numbers with the given number of half-digits and base.
-    
-    For each unit added to the right hand side, we can add a unit to any of the digits on the left
-    while keeping balance. Iterate over all possible right hand side values (base ** half_digits)
-    and for each one iterate over the left hand side digits adding the balancing unit to it.
-    (That is a poor explanation...)   
+    Return the next balanced number reducing only the rigth side.
     """
-    for number_right in range(1, base ** half_digits):
-        for partition in get_partitions(get_basex_digit_list(number_right, base)):
-            while len(partition) < half_digits:
-                partition.insert(0, 0)
-            for cpartition in itertools.permutations(partition):
-                number_left = get_base10_value(partition, base) * base ** half_digits
-                number = number_left + number_right
-                if number > limit:
-                    continue
-                yield number
-            
-            
-    
-def get_partitions(digit_list):
-    for partition in get_partitions_breadth_first(digit_list):
-        yield from get_partitions_depth_first(partition)
+    if len(digit_list) == 1:
+        return digit_list
+    left_sum = get_left_sum(digit_list)
+    right_sum = get_right_sum(digit_list)
+    diff = right_sum - left_sum
+    half = get_half_digits(digit_list)
 
-        
-def get_partitions_breadth_first(digit_list):
-    yield digit_list.copy()
-    new_partitions = 0
-    for i in reversed(range(1, len(digit_list))):
-        while digit_list[i] +1 < digit_list[i-1]:
-            digit_list[i-1] -= 1
-            digit_list[i] += 1
-            new_partitions += 1
-            yield digit_list.copy()
+    # The number is already balanced
+    if diff == 0:
+        return digit_list
 
-            
-def get_partitions_depth_first(digit_list):
-    yield digit_list.copy()
-    new_partitions = 0
-    for i in reversed(range(1, len(digit_list))):
-        if digit_list[i] < digit_list[i-1]:
-            digit_list[i-1] -= 1
-            digit_list[i] += 1
-            new_partitions += 1
-    if new_partitions == 0:
-        return
-    yield from get_partitions_depth_first(digit_list)
-        
+    # The right side is smaller: rearrange to make larger
+    if diff < 0:
 
-def get_odd_digit_balanced_numbers(half_digits, base, limit):
-    for i in range(base):
-        for number_right in range(1, base ** half_digits):
-            for partition in get_partitions(get_basex_digit_list(number_right, base)):
-                number_left = get_base10_value(partition, base) * base ** (half_digits + 1)
-                number = number_left + i * base ** half_digits + number_right
-                if number > limit:
-                    continue
-                yield number
+        # Find the largest digit that will have to decrease
+        digit_to_decrease = left_sum // (base - 1) + 1
+        if digit_list[-digit_to_decrease] < left_sum % (base - 1):
+            digit_to_decrease += 1
+            while digit_list[-digit_to_decrease] == 0:
+                digit_to_decrease += 1
+        # Prepare list if decreasing more than one digit
+        if digit_to_decrease > 1:
+            for i in range(1, digit_to_decrease):
+                digit_list[-i] = base - 1
+            digit_list[-digit_to_decrease] -= 1
+        diff = get_right_sum(digit_list) - get_left_sum(digit_list)
 
-
-def get_balanced_list(digits, base, limit):
-        
-    numbers = set()
-    
-    if base > limit:
-        numbers.update([i for i in range(1, limit +1)])
-    else:
-        numbers.update([i for i in range(1, base)])
-    
-    for i in range(2, digits + 1):
-        
-        # The number of digits that should be balanced (includes the shared central digit if it is an odd num)
-        half_digits = get_half_digits(i)
-        
-        if i % 2 == 0:
-            print("getting {} digits even".format(i))
-            numbers.update(get_even_digit_balanced_numbers(half_digits, base, limit=limit))
+    # Subtract from right until balanced
+    for i in range(half):
+        index = -i -1
+        if digit_list[index] >= diff:
+            digit_list[index] -= diff
+            break
         else:
-            print("getting {} digits odd".format(i))
-            numbers.update(get_odd_digit_balanced_numbers(half_digits-1, base, limit=limit))
-        print(sorted(numbers))
-    return sorted(numbers)
+            diff -= digit_list[index]
+            digit_list[index] = 0
+    return digit_list
+
+
+def can_balance_right(digit_list, base):
+    """
+    Check if it is possible to balance the number reducing only the right side.
+    """
+    if len(digit_list) == 1:
+        return True
+    left_sum = get_left_sum(digit_list)
+    right_sum = get_right_sum(digit_list)
+    if right_sum >= left_sum:
+        return True
+    half = get_half_digits(digit_list)
+    for i in range(half):
+        if digit_list[i - half] > 0:
+            max_right = digit_list[i - half] - 1 + (base - 1) * (half - i - 1)
+            return max_right >= left_sum
+
+
+def decrease_left(digit_list, base):
+    """
+    Decrease the left hand side.
+    """
+    print(len(digit_list))
+    half = get_half_digits(digit_list)
+    # Find the smallest non-zero digit to decrease
+    for i in range(1, half + 1):
+        if digit_list[-half - i] > 0:
+            digit_list[-half - i] -= 1
+            for j in range(half + i):
+                digit_list[-j] = base - 1
+            break
+    return digit_list
+
+
+def decrease_right(digit_list, base):
+    """
+    Decrease the right hand side (decrease the number by 1).
+    """
+    decreased = get_base10_value(digit_list, base) - 1
+    return get_basex_digit_list(decreased, base)
 
 
 def get_base10_value(digit_list, base):
@@ -110,18 +101,46 @@ def get_basex_digit_list(n, base):
         digit_list.insert(0, n % base)
         n = n // base
     return digit_list
-        
 
-modulo = 1004535809
-data_input = fileinput.input()
-line1 = data_input[0].split()
-base = int(line1[0])
-digits = int(line1[1])
-digit_str_list = data_input[1].split()
-digit_list = [int(x) for x in digit_str_list]
-base10_value = get_base10_value(digit_list, base)
-#print(base10_value)
-balanced_list = get_balanced_list(digits, base, base10_value)
-#print(balanced_list)
-print([i for i in itertools.permutations([0,1,0])])
-print("{0} {1}".format(len(balanced_list) % modulo, sum(balanced_list) % modulo))
+
+def get_half_digits(digits):
+    half = len(digits) // 2
+    if half == 0:
+        return 1
+    return half
+
+
+def get_left_sum(digit_list):
+    half = get_half_digits(digit_list)
+    return sum(digit_list[:half])
+
+
+def get_next_balanced_desc(digit_list, base):
+    if can_balance_right(digit_list, base):
+        balance_right(digit_list, base)
+        yield digit_list
+        return get_next_balanced_desc(decrease_right(digit_list, base), base)
+    else:
+        return get_next_balanced_desc(decrease_left(digit_list, base), base)
+
+
+def get_right_sum(digit_list):
+    half = get_half_digits(digit_list)
+    return sum(digit_list[-half:])
+
+
+if __name__ == "__main__":
+    import fileinput
+    modulo = 1004535809
+    data_input = fileinput.input()
+    line1 = data_input[0].split()
+    base = int(line1[0])
+    digits = int(line1[1])
+    digit_str_list = data_input[1].split()
+    digit_list = [int(x) for x in digit_str_list]
+    base10_value = get_base10_value(digit_list, base)
+    # print(base10_value)
+    balanced_list = [i for i in get_next_balanced_desc(digit_list, base)]
+    print(balanced_list)
+    print("{0} {1}".format(len(balanced_list) % modulo, sum(balanced_list) % modulo))
+
