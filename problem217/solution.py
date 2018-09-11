@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import datetime
+
 
 def balance_right(digit_list, base):
     """
@@ -175,13 +177,12 @@ def get_next_balanced_desc(digit_list, base):
     :return: The next balanced number in descending order as a digit list.
     """
     if not digit_list:
-        return
+        return None
     if can_balance_right(digit_list, base):
         balance_right(digit_list, base)
-        yield get_base10_value(digit_list, base)
-        yield from get_next_balanced_desc(decrease_right(digit_list, base), base)
+        return get_base10_value(digit_list, base)
     else:
-        yield from get_next_balanced_desc(decrease_left(digit_list, base), base)
+        return get_next_balanced_desc(decrease_left(digit_list, base), base)
 
 
 def get_right_sum(digit_list):
@@ -204,11 +205,17 @@ def get_result(digit_list, base, modulo):
     :param modulo: The modulo to use to reduce answer.
     :return: The string with the two values expected.
     """
+    start = datetime.datetime.now()
     total = 0
     sum_value = 0
-    for i in get_next_balanced_desc(digit_list, base):
+    next_value = get_next_balanced_desc(digit_list, base)
+    while next_value:
+        print(next_value)
         total = (total + 1) % modulo
-        sum_value = (sum_value + i) % modulo
+        sum_value = (sum_value + next_value) % modulo
+        next_value = get_next_balanced_desc(decrease_right(get_basex_digit_list(next_value, base), base), base)
+    stop = datetime.datetime.now()
+    print(stop - start)
     return "{0} {1}".format(total, sum_value)
 
 
