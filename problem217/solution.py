@@ -3,7 +3,7 @@
 
 def balance_right(digit_list, base):
     """
-    Return the next balanced number reducing only the rigth side.
+    Return the next balanced number reducing only the right side.
     """
     if len(digit_list) == 1:
         return digit_list
@@ -48,13 +48,19 @@ def can_balance_right(digit_list, base):
     """
     Check if it is possible to balance the number reducing only the right side.
     """
+    # True if it is a single digit
     if len(digit_list) == 1:
         return True
+    # True if right is larger than left
     left_sum = get_left_sum(digit_list)
     right_sum = get_right_sum(digit_list)
     if right_sum >= left_sum:
         return True
+    # True if central digit > 0
     half = get_half_digits(digit_list)
+    if len(digit_list) % 2 and digit_list[half] > 0:
+        return True
+    # True if right sum can be made greater
     for i in range(half):
         if digit_list[i - half] > 0:
             max_right = digit_list[i - half] - 1 + (base - 1) * (half - i - 1)
@@ -65,14 +71,12 @@ def decrease_left(digit_list, base):
     """
     Decrease the left hand side.
     """
-    print(len(digit_list))
     half = get_half_digits(digit_list)
     # Find the smallest non-zero digit to decrease
-    for i in range(1, half + 1):
-        if digit_list[-half - i] > 0:
-            digit_list[-half - i] -= 1
-            for j in range(half + i):
-                digit_list[-j] = base - 1
+    for i in reversed(range(half)):
+        if digit_list[i] > 0:
+            digit_list[i] -= 1
+            digit_list[i+1:] = [base-1] * len(digit_list[i+1:])
             break
     return digit_list
 
