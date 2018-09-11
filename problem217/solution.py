@@ -3,7 +3,13 @@
 
 def balance_right(digit_list, base):
     """
-    Return the next balanced number reducing only the right side.
+    Return the next balanced number in descending order,
+    reducing only the right side.
+    (It is assumed that this is possible)
+
+    :param digit_list: The number as a list of digits.
+    :param base: The base number representation.
+    :return: The new balanced number as a list of digits.
     """
     if len(digit_list) == 1:
         return digit_list
@@ -46,7 +52,12 @@ def balance_right(digit_list, base):
 
 def can_balance_right(digit_list, base):
     """
-    Check if it is possible to balance the number reducing only the right side.
+    Check if it is possible to balance the given number without
+    decreasing the left hand side.
+
+    :param digit_list: The number to balance as a list of digits.
+    :param base: The base number representation.
+    :return: True if it is possible.
     """
     # True if it is a single digit
     if len(digit_list) == 1:
@@ -69,7 +80,11 @@ def can_balance_right(digit_list, base):
 
 def decrease_left(digit_list, base):
     """
-    Decrease the left hand side.
+    Decrease the left hand side by the smallest amount possible.
+
+    :param digit_list: The number as a list of digits.
+    :param base: The base number representation.
+    :return: The new decreased number as a list of digits.
     """
     half = get_half_digits(digit_list)
     # Find the smallest non-zero digit to decrease
@@ -85,13 +100,25 @@ def decrease_left(digit_list, base):
 
 def decrease_right(digit_list, base):
     """
-    Decrease the right hand side (decrease the number by 1).
+    Decrease the right hand side by the smallest amount possible
+    (Decrease the number by one).
+
+    :param digit_list: The number as a list of digits.
+    :param base: The base number representation.
+    :return: The new decreased number as a list of digits.
     """
     decreased = get_base10_value(digit_list, base) - 1
     return get_basex_digit_list(decreased, base)
 
 
 def get_base10_value(digit_list, base):
+    """
+    Get the value in base-10 representation.
+
+    :param digit_list: The number to translate as a list of digits.
+    :param base: The base number representation.
+    :return: The base-10 representation as an int.
+    """
     value = 0
     for i in range(len(digit_list)):
         value += digit_list[i] * base ** (len(digit_list) - i - 1)
@@ -100,7 +127,12 @@ def get_base10_value(digit_list, base):
 
 def get_basex_digit_list(n, base):
     """
-    Get a digit_list representation for the number n in the given base.
+    Get the representation of a base-10 number in the given base
+    as a list of digits.
+
+    :param n: The base-10 number to translate (int).
+    :param base: The base number representation to translate to.
+    :return: The translated number as a list of digits.
     """
     digit_list = []
     while n > 0:
@@ -110,6 +142,13 @@ def get_basex_digit_list(n, base):
 
 
 def get_half_digits(digits):
+    """
+    Get the number of digits that should be balanced.
+    (Does not include central shared digit if odd numbered)
+
+    :param digits: The number as a list of digits.
+    :return: The number of digits that should be balanced.
+    """
     half = len(digits) // 2
     if half == 0:
         return 1
@@ -117,11 +156,24 @@ def get_half_digits(digits):
 
 
 def get_left_sum(digit_list):
+    """
+    Get the sum of the left hand digits.
+
+    :param digit_list: The number as a list of digits.
+    :return: The sum value of the left hand side digits.
+    """
     half = get_half_digits(digit_list)
     return sum(digit_list[:half])
 
 
 def get_next_balanced_desc(digit_list, base):
+    """
+    Get the next balanced number.
+
+    :param digit_list: Starting number as a digit list, will return this if balanced.
+    :param base: The base number representation.
+    :return: The next balanced number in descending order as a digit list.
+    """
     if not digit_list:
         return
     if can_balance_right(digit_list, base):
@@ -133,11 +185,25 @@ def get_next_balanced_desc(digit_list, base):
 
 
 def get_right_sum(digit_list):
+    """
+    Get the sum of the right hand digits.
+
+    :param digit_list: The number as a list of digits.
+    :return: The sum value of the right hand side digits.
+    """
     half = get_half_digits(digit_list)
     return sum(digit_list[-half:])
 
 
 def get_result(digit_list, base, modulo):
+    """
+    Get the result as expected.
+
+    :param digit_list: The initial number as a list of digits.
+    :param base: The base number representation.
+    :param modulo: The modulo to use to reduce answer.
+    :return: The string with the two values expected.
+    """
     total = 0
     sum_value = 0
     for i in get_next_balanced_desc(digit_list, base):
