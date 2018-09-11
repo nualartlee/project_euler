@@ -112,6 +112,11 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(result, False)
 
     def test_decrease_left(self):
+        digit_list = [1]
+        base = 10
+        correct = []
+        result = solution.decrease_left(digit_list, base)
+        self.assertEqual(result, correct)
         digit_list = [1, 1, 0, 1, 0, 1, 0, 1]
         base = 10
         correct = [1, 1, 0, 0, 9, 9, 9, 9]
@@ -119,7 +124,7 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(result, correct)
         digit_list = [1, 0, 0, 0, 0, 1, 0, 1]
         base = 10
-        correct = [0, 9, 9, 9, 9, 9, 9, 9]
+        correct = [9, 9, 9, 9, 9, 9, 9]
         result = solution.decrease_left(digit_list, base)
         self.assertEqual(result, correct)
         digit_list = [1, 0, 1, 0, 0, 1, 0, 1]
@@ -129,6 +134,11 @@ class TestSolution(unittest.TestCase):
         self.assertEqual(result, correct)
 
     def test_decrease_right(self):
+        digit_list = [1]
+        base = 10
+        correct = []
+        result = solution.decrease_right(digit_list, base)
+        self.assertEqual(result, correct)
         digit_list = [1, 1, 0, 1, 0, 1, 0, 1]
         base = 10
         correct = [1, 1, 0, 1, 0, 1, 0, 0]
@@ -283,6 +293,14 @@ class TestSolution(unittest.TestCase):
         digit_list = [2, 3, 4, 3, 1, 1, 0, 1]
         correct = 3
         result = solution.get_right_sum(digit_list)
+        self.assertEqual(result, correct)
+
+    def test_get_result(self):
+        digit_list = [1, 10, 9]
+        base = 11
+        modulo = 1004535809
+        correct = "31 2662"
+        result = solution.get_result(digit_list, base, modulo)
         self.assertEqual(result, correct)
 
 

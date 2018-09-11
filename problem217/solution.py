@@ -78,6 +78,8 @@ def decrease_left(digit_list, base):
             digit_list[i] -= 1
             digit_list[i+1:] = [base-1] * len(digit_list[i+1:])
             break
+    value = get_base10_value(digit_list, base)
+    digit_list = get_basex_digit_list(value, base)
     return digit_list
 
 
@@ -135,6 +137,15 @@ def get_right_sum(digit_list):
     return sum(digit_list[-half:])
 
 
+def get_result(digit_list, base, modulo):
+    total = 0
+    sum_value = 0
+    for i in get_next_balanced_desc(digit_list, base):
+        total = (total + 1) % modulo
+        sum_value = (sum_value + i) % modulo
+    return "{0} {1}".format(total, sum_value)
+
+
 if __name__ == "__main__":
     import fileinput
     modulo = 1004535809
@@ -144,7 +155,5 @@ if __name__ == "__main__":
     digits = int(line1[1])
     digit_str_list = data_input[1].split()
     digit_list = [int(x) for x in digit_str_list]
-    balanced_list = [i for i in get_next_balanced_desc(digit_list, base)]
-    print(balanced_list)
-    print("{0} {1}".format(len(balanced_list) % modulo, sum(balanced_list) % modulo))
+    print(get_result(digit_list, base, modulo))
 
