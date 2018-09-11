@@ -242,6 +242,15 @@ class TestSolution(unittest.TestCase):
         result = solution.get_left_sum(digit_list)
         self.assertEqual(result, correct)
 
+    def test_get_next_balanced_desc(self):
+        base = 11
+        value = 122
+        digit_list = solution.get_basex_digit_list(value, base)
+        generator = solution.get_next_balanced_desc(digit_list, base)
+        self.assertEqual(next(generator), 122)
+        self.assertEqual(next(generator), 120)
+        self.assertEqual(next(generator), 108)
+
     def test_get_right_sum(self):
         digit_list = [1]
         correct = 1

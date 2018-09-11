@@ -120,12 +120,14 @@ def get_left_sum(digit_list):
 
 
 def get_next_balanced_desc(digit_list, base):
+    if not digit_list:
+        return
     if can_balance_right(digit_list, base):
         balance_right(digit_list, base)
-        yield digit_list
-        return get_next_balanced_desc(decrease_right(digit_list, base), base)
+        yield get_base10_value(digit_list, base)
+        yield from get_next_balanced_desc(decrease_right(digit_list, base), base)
     else:
-        return get_next_balanced_desc(decrease_left(digit_list, base), base)
+        yield from get_next_balanced_desc(decrease_left(digit_list, base), base)
 
 
 def get_right_sum(digit_list):
@@ -142,8 +144,6 @@ if __name__ == "__main__":
     digits = int(line1[1])
     digit_str_list = data_input[1].split()
     digit_list = [int(x) for x in digit_str_list]
-    base10_value = get_base10_value(digit_list, base)
-    # print(base10_value)
     balanced_list = [i for i in get_next_balanced_desc(digit_list, base)]
     print(balanced_list)
     print("{0} {1}".format(len(balanced_list) % modulo, sum(balanced_list) % modulo))
