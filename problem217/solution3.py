@@ -30,14 +30,11 @@ t_d_s = [
 
 def two_digit_sum(sum, m, adder=0):
     #print("two digits: {0} {1} {2}".format(sum, m, adder))
-    if not sum:
-        yield adder
-        return
     if sum >= m:
         number = (sum - (m - 1)) * m + (m - 1)
     else:
         number = sum
-    for _ in range(m - sum % (m-1)):
+    for _ in range(m - abs(m - sum - 1)):
         yield number + adder
         number += (m - 1)
 
@@ -61,7 +58,7 @@ def get_digit_sum(number, base):
     return result
 
 
-def all_balanced(m, limit=1000000):
+def balanced_number_generator(m):
 
     # one digit
     for i in range(1, m):
@@ -88,7 +85,7 @@ def all_balanced(m, limit=1000000):
         if odd:
 
             # For each possible left hand side
-            for left in range(m ** (half-1), m ** (half) - 1):
+            for left in range(m ** (half-1), m ** (half)):
                 digit_sum = get_digit_sum(left, m)
 
                 print("left: {}".format(left))
@@ -99,21 +96,36 @@ def all_balanced(m, limit=1000000):
 
                     # For each right hand side equalling the digit sum
                     for right in x_digit_sum(digit_sum, m, half):
-                        yield left * m**(half + 1) + j*m**half + right
+                        yield left * m ** (half + 1) + j * m ** half + right
+
+        # If the number of total digits is even
+        else:
+
+            # For each possible left hand side
+            for left in range(m ** (half-1), m ** (half)):
+                digit_sum = get_digit_sum(left, m)
+
+                print("left: {}".format(left))
+                print("digit sum: {}".format(digit_sum))
+
+                # For each right hand side equalling the digit sum
+                for right in x_digit_sum(digit_sum, m, half):
+                    yield left * m ** half + right
+
         digits += 1
 
 
 
-#prev = 0
-#for i in all_balanced(10):
+prev = 0
+#for i in balanced_number_generator(10):
 #    print(i)
 #    if i <= prev:
 #        print('          smaller')
 #        break
 #    prev = i
 
-for j in range(1, 19):
-    print([i for i in two_digit_sum(j, 10)])
+#for j in range(20):
+#    print([i for i in two_digit_sum(j, 11)])
 #print([i for i in two_digit_sum(9, 10, strict=True)])
 #for i in x_digit_sum(9, 10, 3):
 #    print(i)
