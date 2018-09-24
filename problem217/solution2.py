@@ -252,7 +252,10 @@ def get_result(digit_list, base, modulo):
     total = 0
     sum_value = 0
     next_value = get_next_balanced_desc(number, base)
+    previous_value = 0
     while next_value:
+        print("{0}\t{1}".format(next_value, next_value - previous_value))
+        previous_value = next_value
         total = (total + 1) % modulo
         sum_value = (sum_value + next_value) % modulo
         next_value = get_next_balanced_desc(next_value - 1, base)
