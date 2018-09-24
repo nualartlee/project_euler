@@ -3,6 +3,20 @@
 from datetime import datetime
 
 
+def get_base10_value(digit_list, base):
+    """
+    Get the value in base-10 representation.
+
+    :param digit_list: The number to translate as a list of digits.
+    :param base: The base number representation.
+    :return: The base-10 representation as an int.
+    """
+    value = 0
+    for i in range(len(digit_list)):
+        value += digit_list[i] * base ** (len(digit_list) - i - 1)
+    return value
+
+
 def get_two_digit_sum_table(m):
     """
     For each possible digit sum value:
@@ -150,23 +164,36 @@ def balanced_number_generator(m):
         digits += 1
 
 
-maxim = 10 ** 8
-start = datetime.now()
-for i in balanced_number_generator(10):
-    if i > maxim:
-        break
-print(datetime.now() - start)
+def solution(digit_list, base, modulo):
+    """
+    Get the result as expected.
 
-#for j in range(20):
-#    print([i for i in two_digit_sum(j, 11)])
-#print([i for i in two_digit_sum(9, 10, strict=True)])
-#for i in x_digit_sum(12, 10, 3):
-#    print(i)
-#print('\n\n')
-#for i in x_digit_sum(9, 10, 3, strict=True):
-#    print(i)
-#bal_list = [i for i in bal(4, 10, 3)]
-#for i in bal_list:
-#    print(i)
+    :param digit_list: The initial number as a list of digits.
+    :param base: The base number representation.
+    :param modulo: The modulo to use to reduce answer.
+    :return: The string with the two values expected.
+    """
+    limit = get_base10_value(digit_list, base)
+    total = 0
+    sum_value = 0
+
+    for number in balanced_number_generator(base):
+        if number > limit:
+            break
+        total = (total + 1) % modulo
+        sum_value = (sum_value + number) % modulo
+    return "{0} {1}".format(total, sum_value)
 
 
+if __name__ == "__main__":
+    import fileinput
+    modulo = 1004535809
+    data_input = fileinput.input()
+    line1 = data_input[0].split()
+    base = int(line1[0])
+    digits = int(line1[1])
+    digit_str_list = data_input[1].split()
+    digit_list = [int(x) for x in digit_str_list]
+    start = datetime.now()
+    print(solution(digit_list, base, modulo))
+    print(datetime.now() - start)
