@@ -109,6 +109,7 @@ def solution(digit_list, base, modulo):
     sum_value = 0
 
     for number in balanced_number_generator(base):
+        print(number)
         if number > limit:
             break
         total = (total + 1) % modulo
