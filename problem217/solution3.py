@@ -28,6 +28,7 @@ t_d_s = [
     [99],
 ]
 
+
 def two_digit_sum(sum, m, adder=0):
     #print("two digits: {0} {1} {2}".format(sum, m, adder))
     if sum >= m:
@@ -40,9 +41,13 @@ def two_digit_sum(sum, m, adder=0):
 
 
 def x_digit_sum(sum, m, x, adder=0):
+
+    # If more than 2 digits
     if x > 2:
-        for i in range(sum + 1):
+
+        for i in range(m if sum > (m - 1) else sum + 1):
             yield from x_digit_sum(sum - i, m,  x - 1, adder + i * m ** (x-1))
+
     else:
         yield from two_digit_sum(sum, m, adder)
 
@@ -88,8 +93,8 @@ def balanced_number_generator(m):
             for left in range(m ** (half-1), m ** (half)):
                 digit_sum = get_digit_sum(left, m)
 
-                print("left: {}".format(left))
-                print("digit sum: {}".format(digit_sum))
+                #print("left: {}".format(left))
+                #print("digit sum: {}".format(digit_sum))
 
                 # For each possible central digit
                 for j in range(m):
@@ -105,8 +110,8 @@ def balanced_number_generator(m):
             for left in range(m ** (half-1), m ** (half)):
                 digit_sum = get_digit_sum(left, m)
 
-                print("left: {}".format(left))
-                print("digit sum: {}".format(digit_sum))
+                #print("left: {}".format(left))
+                #print("digit sum: {}".format(digit_sum))
 
                 # For each right hand side equalling the digit sum
                 for right in x_digit_sum(digit_sum, m, half):
@@ -117,17 +122,17 @@ def balanced_number_generator(m):
 
 
 prev = 0
-#for i in balanced_number_generator(10):
-#    print(i)
-#    if i <= prev:
-#        print('          smaller')
-#        break
-#    prev = i
+for i in balanced_number_generator(10):
+    print(i)
+    if i <= prev:
+        print('          smaller')
+        break
+    prev = i
 
 #for j in range(20):
 #    print([i for i in two_digit_sum(j, 11)])
 #print([i for i in two_digit_sum(9, 10, strict=True)])
-#for i in x_digit_sum(9, 10, 3):
+#for i in x_digit_sum(12, 10, 3):
 #    print(i)
 #print('\n\n')
 #for i in x_digit_sum(9, 10, 3, strict=True):
