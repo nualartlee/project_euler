@@ -149,6 +149,25 @@ def two_digit_sum_lookup(sum, two_digit_sum_table, adder=0):
         yield num + adder
 
 
+def two_digit_sum_result(sum, m):
+    """
+    Return the possibility count and total for two digits adding to the given sum.
+
+    :param sum: Value of the sum of the two digits
+    :param m: Base number system
+    :return: (x, y) tuple where x = number count and y = sum of all numbers.
+    """
+    # Calculate possibilities
+    c = m - abs(m - sum - 1)
+
+    # Calculate sum
+    s2 = 0
+    if sum <= m - 1:
+        s2 = (((c - 1) * c) // 2) * (m + 1)
+
+    return c, s2
+
+
 def x_digit_sum_generator(sum, m, two_digit_sum_table, x, adder=0):
     """
     Return all the numbers (up to x digits) whose digit sum equals the given value.
@@ -194,6 +213,17 @@ if __name__ == "__main__":
     print(solution(digit_list, base, modulo))
     print(datetime.now() - start)
 
-    table = get_two_digit_sum_table(10)
+    m = 10
+    table = get_two_digit_sum_table(m)
+    j = 0
     for i in table:
-        print("{0} {1}".format(sum(i), i))
+        print("{0} {1} {2} {3}".format(len(i), sum(i), sum(i) - j, i))
+        j = sum(i)
+
+    print('\n\n')
+
+    for i in range(2 * m - 1):
+        c, s = two_digit_sum_result(i, m)
+        print("{0} {1}".format(c, s))
+
+
