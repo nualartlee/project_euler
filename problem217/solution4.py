@@ -55,6 +55,63 @@ def balanced_number_generator(m):
         digits += 1
 
 
+def balanced_number_result(m, max_digits):
+
+    num_count = 0
+    num_sum = 0
+
+    # Get the table with the two-digit sums:
+    tds_table = two_digit_sum_result_table(m)
+
+    # One digit numbers
+    num_count += m - 1
+    num_sum += ((m - 1) * m) // 2
+
+    # Two digit numbers
+    num_count += m - 1
+    num_sum += ((m + 1) + ((m-1) * m - (m - 1)) * (m - 1)) // 2
+
+    # Three digit numbers
+    num_count += (m - 1) * m
+    # Middle digit sum
+    num_sum += ((m - 1)**2 * m) // 2
+    # Side digit sum
+    num_sum += ((m - 1) * m // 2) * (m**2 + 1)
+
+    # Larger numbers
+    digits = 4
+    while digits <= max_digits:
+        half = digits // 2
+        odd = digits % 2
+
+        # If the number of total digits is odd
+        if odd:
+
+            # For each possible left hand side
+            for left in range(m ** (half-1), m ** (half)):
+                digit_sum = get_digit_sum(left, m)
+
+                # For each possible central digit
+                for j in range(m):
+
+                    # For each right hand side equalling the digit sum
+                    for right in x_digit_sum_generator(digit_sum, m, tds_table, half):
+                        yield left * m ** (half + 1) + j * m ** half + right
+
+        # If the number of total digits is even
+        else:
+
+            # For each possible left hand side
+            for left in range(m ** (half-1), m ** (half)):
+                digit_sum = get_digit_sum(left, m)
+
+                # For each right hand side equalling the digit sum
+                for right in x_digit_sum_generator(digit_sum, m, tds_table, half):
+                    yield left * m ** half + right
+
+        digits += 1
+
+
 def get_base10_value(digit_list, base):
     """
     Get the value in base-10 representation.
@@ -162,10 +219,30 @@ def two_digit_sum_result(sum, m):
 
     # Calculate sum
     s2 = 0
-    if sum <= m - 1:
+    if sum < m:
         s2 = (((c - 1) * c) // 2) * (m + 1)
+    else:
+        s2 = (m**3 - m) // 2
+        d = sum - m + 1
+        diff = (((d - 1) * d) // 2) * (m + 1)
+        s2 -= diff
 
     return c, s2
+
+
+def two_digit_sum_result_table(m):
+    """
+    For each possible digit sum value:
+    Return the count and total of numbers (up to two digits) whose digit sum equals a given value.
+
+    :param m: Base number system
+    :return: List of tuples (x, y) where x is the number count and y the total.
+    Index of the list indicates digit sum.
+    """
+    result = []
+    for i in range(2 * m - 1):
+        result.append(two_digit_sum_result(i, m))
+    return result
 
 
 def x_digit_sum_generator(sum, m, two_digit_sum_table, x, adder=0):
@@ -213,17 +290,21 @@ if __name__ == "__main__":
     print(solution(digit_list, base, modulo))
     print(datetime.now() - start)
 
-    m = 10
-    table = get_two_digit_sum_table(m)
+    m = 100
+    start = datetime.now()
+    table = get_two_digit_sum_table(10)
+    print(datetime.now() - start)
     j = 0
     for i in table:
-        print("{0} {1} {2} {3}".format(len(i), sum(i), sum(i) - j, i))
+        #print("{0} {1} {2} {3}".format(len(i), sum(i), sum(i) - j, i))
         j = sum(i)
 
     print('\n\n')
 
+    start = datetime.now()
     for i in range(2 * m - 1):
         c, s = two_digit_sum_result(i, m)
-        print("{0} {1}".format(c, s))
+        #print("{0} {1}".format(c, s))
+    print(datetime.now() - start)
 
 
