@@ -196,4 +196,4 @@ if __name__ == "__main__":
 
     table = get_two_digit_sum_table(10)
     for i in table:
-        print(i)
+        print("{0} {1}".format(sum(i), i))
