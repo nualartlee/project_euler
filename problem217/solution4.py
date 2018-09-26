@@ -245,6 +245,29 @@ def two_digit_sum_result_table(m):
     return result
 
 
+def x_digit_sum_result_table(m, digits, previous_table):
+    """
+
+    :param m:
+    :param digits:
+    :param previous_table:
+    :return:
+    """
+    table = []
+    # Intersection with previous table
+    for i in range(m * (digits - 1) - 1):
+        c = sum([previous_table[i][0] for i in range(m * (digits - 1) - 1 - i)])
+        s = sum([previous_table[i][1] for i in range(m * (digits - 1) - 1 - i)])
+        table.append((c, s))
+    # Additional sums beyond previous table
+    for i in range(m * digits -1):
+        c = 1
+        s = i * m * digits + previous_table[m * (digits - 1) - 2][1]
+
+    return table
+
+
+
 def x_digit_sum_generator(sum, m, two_digit_sum_table, x, adder=0):
     """
     Return all the numbers (up to x digits) whose digit sum equals the given value.
@@ -277,6 +300,47 @@ def x_digit_sum_generator(sum, m, two_digit_sum_table, x, adder=0):
         yield from two_digit_sum_lookup(sum, two_digit_sum_table, adder)
 
 
+def x_digit_sum_result(sum, m, two_digit_sum_table, x, multiplier=1):
+    """
+    Return all the numbers (up to x digits) whose digit sum equals the given value.
+
+    :param sum: Value of the sum of the number's digits
+    :param m: Base number system
+    :param two_digit_sum_table: A table with the lists of all posible two digit sums (see get_two_digit_sum_table)
+    :param x: Number of digits
+    :param adder: And additional value to add to each returned number
+    :return: The next number in increasing order
+    """
+
+    # If more than 2 digits:
+    if x > 2:
+
+        # Minimum (start) value for this digit must be large enough to reach the digit sum
+        required_digits = sum // (m - 1)
+        # All digits maxed out
+        if required_digits == x:
+            return 1 * multiplier, (m ** (x + 1) - 1) * multiplier
+        # All but one digit maxed out
+        elif required_digits == x - 1:
+            start = sum % (m - 1)
+        # At least one free digit
+        else:
+            start = 0
+
+        # Number of possibilities this digit adds (multiplier of possibilities for subsequent digits)
+        if sum > (m - 1):
+           multiplier *= m - start
+        else:
+            multiplier *= sum + 1 - start
+
+        # Reduce and recurse until only two digits are left
+        return x_digit_sum_generator(sum - i, m, two_digit_sum_table,  x - 1, multiplier)
+
+    # If only two digits: return from two_digit_sum
+    else:
+        yield from two_digit_sum_lookup(sum, two_digit_sum_table, adder)
+
+
 if __name__ == "__main__":
     import fileinput
     modulo = 1004535809
@@ -290,21 +354,28 @@ if __name__ == "__main__":
     print(solution(digit_list, base, modulo))
     print(datetime.now() - start)
 
-    m = 100
+    m = 10
     start = datetime.now()
-    table = get_two_digit_sum_table(10)
+    table = get_two_digit_sum_table(m)
     print(datetime.now() - start)
     j = 0
     for i in table:
-        #print("{0} {1} {2} {3}".format(len(i), sum(i), sum(i) - j, i))
+        print("{0} {1} {2}".format(len(i), sum(i), i))
         j = sum(i)
 
     print('\n\n')
 
     start = datetime.now()
+    t2 = two_digit_sum_result_table(m)
+    t3 = x_digit_sum_result_table(m, 3, t2)
+    for i in t3:
+        print(i)
+
+
     for i in range(2 * m - 1):
-        c, s = two_digit_sum_result(i, m)
-        #print("{0} {1}".format(c, s))
+        #c, s = two_digit_sum_result(i, m)
+        #print("{0} {1} {2}".format(i, c, s))
+        pass
     print(datetime.now() - start)
 
 
